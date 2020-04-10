@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block main %}
+  <div class="container p-5">
+    <div class="row">
+      <div class="col-md-8">
+        <h1 class="mb-md-4">Login</h1>
+        <div class="card">
+          <div class="card-body">
+            <form action="/login" method="post">
+              <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" name="email" id="email" aria-describedby="email" placeholder="Enter email" value="{{ email }}">
+              </div>
+              <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input type="password" class="form-control" id="Password" placeholder="Enter password" name="password" value="">
+              </div>
+              
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Lets go!</button>
+                <a href="/" class="btn btn-link">Go back</a>
+              </div>
+            </form>
+              <div class="mt-md-4">
+                <a href="/forgot">Forgot your password?</a>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+	<div class="container p-5">
+		<div class="row">
+			<div class="col-md-8">
+				<h1>Register</h1>
+				<p>Please first register yourself as a party host.</p>
+
+				<!--<p>We will send you emails of when your guests RSVP, provide a dashboard to help you to keep track of everybody and any details they've provided (Like if Aunt Judy plans on bringing her famous brownie bars, or her less than welcome crab dip), and to send your guests any party updates (looking at you coronavirus who rescheduled EVERYTHING). Also included will be a final head count .csv and day before reminders to your guests of what they said they would bring and of your event!</p>-->
+				<form action="/register" method="post">
+					<div class="form-group">
+				    	<label for="username">Host Name</label>
+				    	<input autocomplete="off" type="text" class="form-control" id="username" name="username" aria-describedby="username" placeholder="Enter your name" value="{{ username }}">
+				    	<small>This is the name your guests will know you by.</small>
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="email">Email address</label>
+				    	<input type="email" class="form-control" name="email" id="email" aria-describedby="email" placeholder="Enter email" value="{{ email }}">
+				    	<small>Your email address is what will be used to log you in.</small>
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="exampleInputPassword1">Password</label>
+				    	<input type="password" class="form-control" id="Password" placeholder="Enter password" name="password" value="">
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="confirmation">Re-type Password</label>
+				    	<input type="password" name="confirmation" class="form-control" id="confirmation" placeholder="Re-enter password" placeholder="Password">
+				  	</div>
+				  	<div class="form-group">
+				  		<button type="submit" class="btn btn-primary">Make a new event!</button>
+				  	</div>
+				</form>
+			</div>
+		</div>
+  	</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+body {
+	/*
+	background-image: url(images/light-grey-terrazzo.png);
+	background-repeat: repeat;
+	background-color: red;
+	*/
+}
+
+h3 {
+	color: purple;
+}
+
+.hero {
+    position: relative;
+}
+
+.hero:after {
+    content: "";
+    background-image: url(images/sunset.jpg);
+    /*
+    hero image:
+    <a href="https://www.freepik.com/free-photos-vectors/abstract">Abstract vector created by vectorpouch - www.freepik.com</a>
+    */;
+    background-position: bottom center;
+    background-size: cover;
+    opacity: 0.9;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+.jumbotron {
+    background: none;
+}
+
+.jumbotron div {
+	min-height: 250px;
+}
+
+.jumbotron .btn-primary {
+	color: darkslategrey;
+	background-color: white;
+	border-color: white;
+}
+
+.jumbotron .btn-primary:hover {
+	background-color: lightpink;
+	border-color: lightpink;
+}
