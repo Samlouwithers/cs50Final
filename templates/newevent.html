@@ -5,5 +5,70 @@
 {% endblock %}
 
 {% block main %}
-  <h1>New Event</h1>
+  <div class="container p-5">
+    <div class="row">
+      <div class="col-md-8">
+        <h1 class="mb-md-4">Create new event</h1>
+        <div class="card">
+          <div class="card-body">
+            <form action="/newevent" method="post">
+              <div class="form-group">
+                <label for="eventName">Event Name</label>
+                <input type="text" class="form-control" name="eventName" id="eventName" aria-describedby="eventName" placeholder="" value="{{ eventName }}">
+              </div>
+              <div class="form-group">
+                <label for="date">Event Date</label>
+                <input type="date" min="{{ minDate }}" class="form-control" name="date" id="date" aria-describedby="eventDate" placeholder="" value="{{ eventDate }}">
+              </div>
+              <div class="form-group">
+			    <label for="address">Event Address</label>
+			    <input type="text" class="form-control" name="address" id="address" placeholder="">
+			  </div>
+			  <!--
+			  <div class="form-row">
+			    <div class="form-group col-md-6">
+			      <label for="city">City</label>
+			      <input type="text" class="form-control" id="city">
+			    </div>
+			    
+			    <div class="form-group col-md-4">
+			      <label for="state">State</label>
+			      <select id="state" name="state" class="form-control">
+			      	<option selected>Choose...</option>
+			      	{%for i in range(0, stateLen)%}
+			        	<option>{{ states[i] }}</option>
+			        {%endfor%}
+			      </select>
+			    </div>
+			    <div class="form-group col-md-2">
+			      <label for="zip">Zip</label>
+			      <input type="text" class="form-control" name="zip" id="zip">
+			   </div>
+			-->
+
+			   <div class="form-group">
+			    <label for="theme">Event Theme</label>
+			    <input type="text" class="form-control" name="theme" id="theme" placeholder="">
+			  </div>
+
+			  <div class="form-group">
+			    <label for="registry">Event Registry?</label>
+			    <input type="text" class="form-control" name="registry" id="registry" placeholder="">
+			  </div>
+
+
+              
+              
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Lets go!</button>
+                <a href="/" class="btn btn-link">Go back</a>
+              </div>
+            </form>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

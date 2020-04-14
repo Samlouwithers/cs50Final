@@ -5,12 +5,93 @@
 {% endblock %}
 
 {% block main %}
-<div class="container p-5">
+<div class="container mt-md-5">
     <div class="row">
       	<div class="col">
   			<h1>Welcome back {{ user }}!</h1>
-  			<p>Hmm it doesn't seem like you have any upcoming events. Would you like to add any?</p>
-  			<a href="" class="btn btn-primary">YAS! Make a new Event</a>
+  			<p>Here's your upcoming parties!</p>
+  			{%if haveEvents > 0 %}
+  				{%for i in range(0, haveEvents)%}
+
+
+
+
+
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="card dashboard-card">
+			  	<div class="card-header">
+			    	<h3>{{ myEvents[i]['eventName'] }}</h3>
+			  	</div>
+			  	<div class="card-body">
+			  		<div class="row">
+					    <div class="col-sm">
+					    	<label><strong>Date of Event:</strong></label>
+					      	<p>{{ myEvents[i]['date'] }}</p>
+					    </div>
+					    <div class="col-sm">
+					    	<label><strong>Address:</strong></label>
+					      	<p>{{ myEvents[i]['address'] }}</p>
+					    </div>
+					    <div class="col-sm">
+					    	<label><strong>Theme:</strong></label>
+					      	<p>{{ myEvents[i]['theme'] }}</p>
+					    </div>
+					    <div class="col-sm">
+					    	<label><strong>Registry:</strong></label>
+					      	<p><a href="" target="_blank">{{ myEvents[i]['registry'] }}</a></p>
+					    </div>
+					</div>
+					<h4 class="mt-md-5">Guest list</h4>
+					<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Larry</td>
+      <td>the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+
+ <div class="text-right"> 
+
+			    	<a href="#" class="btn btn-primary">Edit</a>
+			    	<a href="#" class="btn btn-primary">print PDF of guest list</a>
+			    	<a href="#" class="btn btn-primary">Email Guests</a>
+			    </div>
+			  	</div>
+			</div>
+		</div>
+	</div>
+
+	<a href="/newevent" class="btn btn-primary">YAS! Make a new Event</a>
+
+  				{%endfor%}
+  			{% else %}
+		     	<p>Hmm it doesn't seem like you have any upcoming events. Would you like to add any?</p>
+	  			<a href="/newevent" class="btn btn-primary">YAS! Make a new Event</a>
+		    {% endif %}
   		</div>
   	</div>
 </div>

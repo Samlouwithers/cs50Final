@@ -5,5 +5,30 @@
 {% endblock %}
 
 {% block main %}
-  <h1>RSVP</h1>
+  <div class="container p-5">
+    <div class="row">
+      <div class="col-md-8">
+        <h1 class="mb-md-4">RSVP for an Event</h1>
+        <p>Welcome to Peacocktopia RSVP!</p>
+    	<p>Please enter in your event code (capitalization and spelling counts!)</p>
+        <div class="card">
+          <div class="card-body">
+            <form action="/login" method="post">
+              <div class="form-group">
+                <label for="code">Enter 6-digit code</label>
+                <input type="text" class="form-control" name="code" id="code" aria-describedby="code" placeholder="" value="">
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Lets go!</button>
+                <a href="/" class="btn btn-link">Go back</a>
+              </div>
+            </form>
+              <div class="mt-md-4">
+                <a href="/forgot">Forgot your password?</a>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

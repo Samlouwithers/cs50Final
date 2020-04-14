@@ -3,11 +3,23 @@ body {
 	background-image: url(images/light-grey-terrazzo.png);
 	background-repeat: repeat;
 	background-color: red;
+	
+	background-color: #E5DEDE;
+
 	*/
+
+	background-color: white;
+}
+
+.navbar {
+	font-family: 'Gentium Basic', serif;
+}
+.navbar a {
+	color: darkslategray;
 }
 
 h3 {
-	color: purple;
+	font-family: 'Gentium Basic', serif;
 }
 
 .hero {
@@ -17,13 +29,11 @@ h3 {
 .hero:after {
     content: "";
     background-image: url(images/sunset.jpg);
-    /*
-    hero image:
     <a href="https://www.freepik.com/free-photos-vectors/abstract">Abstract vector created by vectorpouch - www.freepik.com</a>
-    */;
+    */
     background-position: bottom center;
     background-size: cover;
-    opacity: 0.9;
+    opacity: 0.2;
     top: 0;
     left: 0;
     bottom: 0;
@@ -31,6 +41,8 @@ h3 {
     position: absolute;
     z-index: -1;
 }
+
+
 
 .jumbotron {
     background: none;
@@ -46,7 +58,54 @@ h3 {
 	border-color: white;
 }
 
+.jumbotron .btn-primary {
+	font-family: 'Gentium Basic', serif;
+	font-size: 78px;
+	color: darkslategray;
+	background-color: transparent;
+	border-radius: 0;
+	border-color: darkslategray;
+}
+
+/*
+.jumbotron .btn-primary.login {
+	background-image: url("images/grad.jpg");
+	background-position: center;
+}
+
+.jumbotron .btn-primary.event {
+	background-image: url("images/glasses.jpg");
+	background-position: center;
+	background-size: cover
+}
+
+.jumbotron .btn-primary.rsvp {
+	background-image: url("images/bwkidsoft.jpg");
+	background-position: bottom;
+}
+*/
 .jumbotron .btn-primary:hover {
 	background-color: lightpink;
+	background-image: none;
 	border-color: lightpink;
+}
+
+.dashboard-card {
+
+}
+
+.dashboard-card label {
+	margin-bottom: 0;
+}
+
+.btn-primary {
+	border-radius: 0;
+	font-family: 'Gentium Basic', serif;
+	border-color: darkslategray;
+	background-color: white;
+	color: darkslategray;
+}
+
+footer {
+	margin: 50px 0;
 }

@@ -1,6 +1,10 @@
 import sqlite3
 import sys
 import pprint
+#import usaddress
+import time
+import random
+import string
 
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -8,6 +12,9 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
+
+# frontend tools!!
+#from flask.ext.scss import Scss
 
 app = Flask(__name__)
 
@@ -33,17 +40,17 @@ Session(app)
 
 #login required
 def login_required(f):
-    """
-    Decorate routes to require login.
+	"""
+	Decorate routes to require login.
 
-    http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get("user_id") is None:
-            return redirect("/login")
-        return f(*args, **kwargs)
-    return decorated_function
+	http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
+	"""
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		if session.get("user_id") is None:
+			return redirect("/login")
+		return f(*args, **kwargs)
+	return decorated_function
 
 
 # Configure SQLite database
@@ -131,8 +138,75 @@ def dashboard():
 		return render_template("dashboard.html")
 
 	else:
-		pprint.pprint(currentUser)
-		return render_template("dashboard.html", user=user)
+		c.execute("SELECT * FROM events WHERE user_id=?", (currentUser,))
+		myEvents = c.fetchall()
+
+		haveEvents = len(myEvents)
+
+		
+		return render_template("dashboard.html", user=user, haveEvents=haveEvents, myEvents=myEvents)
+
+
+@app.route("/newevent", methods=["GET", "POST"])
+@login_required
+def newevent():
+
+	states = ['Alabama','Alaska','American Samoa','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Federated States of Micronesia','Florida','Georgia','Guam','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Marshall Islands','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Northern Mariana Islands','Ohio','Oklahoma','Oregon','Palau','Pennsylvania','Puerto Rico','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virgin Island','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
+
+	stateLen = len(states)
+
+	minDate = time.strftime('%Y-%m-%d')
+
+	currentUser = int(session["user_id"])
+
+	if request.method == "POST":
+
+		codeNum = ""
+
+		#generate random code number
+		def random_alnum(size=6):
+			"""Generate random 6 character alphanumeric string"""
+			# List of characters [a-zA-Z0-9]
+			chars = string.ascii_letters + string.digits
+			code = ''.join(random.choice(chars) for _ in range(size))
+			return code
+
+		def check_code(code):
+			print("testing")
+			c.execute("SELECT codes FROM events WHERE codes=?", (code,))
+			records = c.fetchall()
+
+			print("Total rows are:  ", len(records))
+			
+			if len(records) >= 1:
+				print('We have a repeat!')
+				codeNum = check_code(random_alnum())
+
+			print(code)
+			codeNum = code;
+			return codeNum
+
+		codeNum = check_code(random_alnum())
+		print("new codenum" + codeNum)
+		eventName = request.form.get("eventName")
+		date = request.form.get("date")
+		address = request.form.get("address")
+		theme = request.form.get("theme")
+		registry = request.form.get("registry")
+
+		c.execute("INSERT INTO events (user_id, eventName, date, address, theme, registry, codes) VALUES (?,?,?,?,?,?,?)",
+				  (currentUser, eventName, date, address, theme, registry, codeNum))
+		conn.commit()
+
+		flash('New Event Created! the party code for ' + eventName + " is " + codeNum)
+		return redirect("/dashboard")
+
+	else:
+		#addressTest = usaddress.tag('Robie House, 5757 South Woodlawn Avenue, Chicago, IL 60637')
+		#print(addressTest)
+		
+		return render_template("newevent.html", states=states, stateLen=stateLen, minDate=minDate)
+
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -200,3 +274,14 @@ def login():
 	# User reached route via GET (as by clicking a link or via redirect)
 	else:
 		return render_template("login.html")
+
+
+@app.route("/rsvp", methods=["GET", "POST"])
+def rsvp():
+
+	# User reached route via POST (as by submitting a form via POST)
+	if request.method == "POST":
+		flash("POST")
+		return render_template("rsvp.html")
+	else:
+		return render_template("rsvp.html")
