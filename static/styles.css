@@ -18,7 +18,7 @@ body {
 	color: darkslategray;
 }
 
-h3 {
+h1, h2, h3, h4 {
 	font-family: 'Gentium Basic', serif;
 }
 
@@ -91,7 +91,42 @@ h3 {
 }
 
 .dashboard-card {
+	border-radius: 0;
+}
 
+.dashboard-card a {
+	color: darkslategray;
+}
+.dashboard-card a:hover {
+	/*color: darkslateblue;*/
+	text-decoration: none;
+}
+
+.dashboard-card h2 {
+	margin-bottom: 0;
+	font-size: 24px;
+}
+
+.dashboard-card .card-header {
+	position: relative;
+	border-bottom: none;
+	padding: 14px;
+}
+
+.dashboard-card .card-header:hover {
+	background-color: lightsteelblue;
+	border-radius: 0;
+}
+
+.dashboard-card .card-header .fa-chevron-down {
+  transition: .3s transform ease-in-out;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  font-size: 20px;
+}
+.dashboard-card .card-header .collapsed .fa-chevron-down {
+  transform: rotate(180deg);
 }
 
 .dashboard-card label {

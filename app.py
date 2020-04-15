@@ -13,6 +13,9 @@ from werkzeug.exceptions import default_exceptions, HTTPException, InternalServe
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 
+#pdf stuff
+from reportlab.pdfgen import canvas
+
 # frontend tools!!
 #from flask.ext.scss import Scss
 
@@ -54,7 +57,7 @@ def login_required(f):
 
 
 # Configure SQLite database
-conn = sqlite3.connect('peacock.db', check_same_thread=False)
+conn = sqlite3.connect('marty.db', check_same_thread=False)
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
@@ -114,7 +117,8 @@ def register():
 		conn.commit()
 
 		# route to event creation page
-		return render_template("newevent.html")
+
+		return render_template("login.html")
 
 	# User reached route via GET (as by clicking a link or via redirect)
 	else:
@@ -134,17 +138,39 @@ def dashboard():
 
 	print(str(user))
 
+	c.execute("SELECT * FROM events WHERE user_id=?", (currentUser,))
+	myEvents = c.fetchall()
+
+	c.execute("SELECT * FROM guests")
+	myGuests = c.fetchall()
+
+	if myEvents is None:
+		haveEvents = 0
+		print("Variable is not defined....!")
+	else:
+		haveEvents = len(myEvents)
+		print("Variable is defined.")
+
+	if myGuests is None:
+		haveGuests = 0
+		print("Variable is not defined....!")
+	else:
+		haveGuests = len(myEvents)
+		print("Variable is defined.")
+
+
 	if request.method == "POST":
-		return render_template("dashboard.html")
+		if request.form['action'] == 'Edit':
+			print("we are editing!")
+		elif request.form['action'] == 'PDF':
+			print("PDF")
+		return render_template("dashboard.html", user=user, haveGuests=haveGuests, haveEvents=haveEvents, myEvents=myEvents, myGuests=myGuests)
 
 	else:
-		c.execute("SELECT * FROM events WHERE user_id=?", (currentUser,))
-		myEvents = c.fetchall()
-
-		haveEvents = len(myEvents)
 
 		
-		return render_template("dashboard.html", user=user, haveEvents=haveEvents, myEvents=myEvents)
+		return render_template("dashboard.html", user=user, haveGuests=haveGuests, haveEvents=haveEvents, myEvents=myEvents, myGuests=myGuests)
+
 
 
 @app.route("/newevent", methods=["GET", "POST"])
@@ -206,6 +232,45 @@ def newevent():
 		#print(addressTest)
 		
 		return render_template("newevent.html", states=states, stateLen=stateLen, minDate=minDate)
+
+
+
+@app.route("/rsvp", methods=["GET", "POST"])
+def rsvp():
+
+	# User reached route via POST (as by submitting a form via POST)
+	if request.method == "POST":
+		#get code from user
+		grabCode = request.form.get("code")
+
+		# Ensure code was submitted
+		if not grabCode:
+			flash('Please enter in a code!')
+			return render_template("rsvp.html")
+
+		# Ensure password was submitted
+		elif len(grabCode) != 6:
+			flash('Codes are 6 characters')
+			return render_template("rsvp.html")
+
+		# Query database for code
+
+		c.execute("SELECT codes FROM events WHERE codes=:codes", {"codes": grabCode})
+		records = c.fetchone()
+
+		#print("Total codes found are:  ", str(records))
+
+		if records is None:
+			flash("Hmm we can't find that code. Remember capitalizaion counts! Please try again.")
+			return render_template("rsvp.html")
+
+		else:
+			record = str(records['codes'])
+			session['partyCode'] = record
+			flash('We found your Party!')
+			return redirect("/guestInfo")
+	else:
+		return render_template("rsvp.html")
 
 
 
@@ -276,12 +341,56 @@ def login():
 		return render_template("login.html")
 
 
-@app.route("/rsvp", methods=["GET", "POST"])
-def rsvp():
 
-	# User reached route via POST (as by submitting a form via POST)
+
+@app.route("/guestInfo", methods=["GET", "POST"])
+def guestInfo():
+	grabCode = session.get('partyCode')
+	print("this your code? " + grabCode)
 	if request.method == "POST":
-		flash("POST")
-		return render_template("rsvp.html")
+
+		#use code to get event ID
+		c.execute("SELECT id FROM events WHERE codes=?", (grabCode,))
+		event_id = c.fetchone()['id']
+
+		first = request.form.get("first")
+		last = request.form.get("last")
+		email = request.form.get("email")
+
+		c.execute("INSERT INTO guests (event_id, first, last, email) VALUES (?,?,?,?)",
+				  (event_id, first, last, email))
+		conn.commit()
+
+		#grab guestcount for current event
+		c.execute("SELECT guests FROM events WHERE codes=?", (grabCode,))
+		guestCount = c.fetchone()['guests'] + 1
+		print(guestCount)
+
+		c.execute("UPDATE events SET guests=? WHERE codes=?", (guestCount, grabCode))
+		conn.commit()
+
+		flash('Thank you ' + first + " for your RSVP! You are all done. Is there anybody else you would like to RSVP for?")
+		return redirect("/guestInfo")
+
+
+			#future state have OR search by host if you know their name. 
+		#go to next tempalte 
+			#next template has flash! we've found your event! now enter please in some basic info so the HOST knows you RSVPed
+			#first
+			#last
+			#email (enter email so host can send you updates and if you want an event reminder. 
+			#Remember, after the event has finished we delete eveything so your email wont be remembered beyond the event)
+			#bringing a plus one? 
+			#if yes input for plusone name
+			#another plus one? 
+			#create array for all the plus ones
 	else:
-		return render_template("rsvp.html")
+		c.execute("SELECT * FROM events WHERE codes=?", (grabCode,))
+		records = c.fetchall()
+
+		host_ID = records[0]['user_id']
+		#grab host name
+		c.execute("SELECT username FROM users WHERE id=?", (host_ID,))
+		hostName = c.fetchone()['username']
+		print(str(hostName))
+		return render_template("guestInfo.html", codes=grabCode, records=records, hostName=hostName)

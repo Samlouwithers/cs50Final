@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    RSVP Info
+{% endblock %}
+
+{% block main %}
+  <div class="container p-5">
+    <div class="row">
+      <div class="col-md-8">
+          <h1 class="mb-md-4">Complete RSVP</h1>
+    	   <p>Lets RSVP for <strong>{{ records[0]['eventName'] }}</strong>!</p>
+          <p>{{ hostName }} would like you to fill out a few things to complete your RSVP.</p>
+        <div class="card">
+          <div class="card-body">
+            <form action="/guestInfo" method="post">
+              <div class="form-group">
+                <label for="first">First name</label>
+                <input type="text" class="form-control" name="first" id="first" aria-describedby="first" placeholder="" value="">
+              </div>
+              <div class="form-group">
+                <label for="last">Last name</label>
+                <input type="text" class="form-control" name="last" id="last" aria-describedby="last" placeholder="" value="">
+              </div>
+              <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" name="email" id="email" aria-describedby="email" placeholder="" value="{{ email }}">
+                <small>This is so {{ hostName }} can email you if any party details are updated.</small>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">RSVP!</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
