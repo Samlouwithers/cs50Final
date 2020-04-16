@@ -75,18 +75,15 @@
 			     			<p>No Guests have RSVP'd yet!</p>
 			    		{% endif %}
 
-			    		<form id="options_form" action="/dashboard" method="post">
-			    			<input type ="submit" name="action" value="Edit">
-			    			<input type ="submit" name="action" value="PDF">
-			    			<input type ="submit" name="action" value="Email">
+			    		<div class="text-right"> 
 
-						 </form>
-					
-		 				<div class="text-right"> 
-					    	<a href="#" class="btn btn-primary">Edit</a>
-					    	<a href="/pdf" class="btn btn-primary">print PDF of guest list</a>
-					    	<a href="#" class="btn btn-primary">Email Guests</a>
-					    </div>
+				    		<form id="options_form" action="/dashboard" method="post">
+				    			<input type="hidden" id="index" name="index" value={{i}}>
+				    			<input type ="submit" class="btn btn-primary" name="action" value="Edit">
+				    			<input type ="submit" class="btn btn-primary" name="action" value="PDF">
+				    			<input type ="submit" class="btn btn-primary" name="action" value="Email">
+							</form>
+						</div>
 					</div>
 			  	</div>
 			</div>

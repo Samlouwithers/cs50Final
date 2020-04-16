@@ -155,15 +155,47 @@ def dashboard():
 		haveGuests = 0
 		print("Variable is not defined....!")
 	else:
-		haveGuests = len(myEvents)
+		haveGuests = len(myGuests)
 		print("Variable is defined.")
 
 
 	if request.method == "POST":
+
+		index = int(request.form.get("index"))
+
 		if request.form['action'] == 'Edit':
 			print("we are editing!")
 		elif request.form['action'] == 'PDF':
 			print("PDF")
+
+
+			#names of everything
+			print(index)
+			print(myEvents[index]['eventName'])
+
+			fileName = myEvents[index]['eventName'] + " guest list.pdf"
+			documentTitle = myEvents[index]['eventName'] + " Guest List"
+			title = myEvents[index]['eventName'] + " guest list"
+			subTitle = 'thank you for using Peacocktopia RSVP! HAVE A GREAT PARTY!'
+
+			textLines = [
+			'welcome to the party',
+			'here it is'
+			]
+
+			print(fileName)
+
+			pdf = canvas.Canvas(fileName)
+			pdf.setTitle(documentTitle)
+
+
+			#Title
+			pdf.drawCenteredString(50, 780, title)
+			
+			pdf.save()
+
+		elif request.form['action'] == 'Email':
+			print("Email Guests")
 		return render_template("dashboard.html", user=user, haveGuests=haveGuests, haveEvents=haveEvents, myEvents=myEvents, myGuests=myGuests)
 
 	else:
