@@ -1,10 +1,10 @@
-#Peacocktopia RSVP app
+# Peacocktopia RSVP app
 
 *This is a web based application built in Python 3 with flask and jinja*
 
 *This is a web app that allows users to create events with details, a neat downloadable PDF for each event, and email updates, with a unique RSVP ID that their guests can easily RSVP online with.*
 
-##orignal set up notes
+## orignal set up notes
 
 Reference this guide for flask/python setup
 https://www.patricksoftwareblog.com/steps-for-starting-a-new-flask-project-using-python3/
