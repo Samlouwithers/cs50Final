@@ -44,11 +44,11 @@
 						      	<p><a href="{{ ''.join(['http://', myEvents[i]['registry']]) }}" target="_blank">{{ myEvents[i]['registry'] }}</a></p>
 						    </div>
 						    <div class="col-sm">
-						    	<label><strong>Guest total:</strong></label>
-						      	<p>{{ myEvents[i]['guests'] }}</p>
+						    	<label><strong>RSVP code:</strong></label>
+						      	<p>{{ myEvents[i]['codes'] }}</p>
 						    </div>
 						</div>
-						<h4 class="mt-md-5">Guest list</h4>
+						<h4 class="mt-md-5">Guest list <small>(total: {{ myEvents[i]['guests'] }})</small></h4>
 						{%if myEvents[i]['guests'] > 0 %}
 							<table class="table">
 							  <thead>
@@ -81,7 +81,7 @@
 				    			<input type="hidden" id="index" name="index" value={{i}}>
 				    			<input type ="submit" class="btn btn-primary" name="action" value="Edit">
 				    			<input type ="submit" class="btn btn-primary" name="action" value="PDF">
-				    			<input type ="submit" class="btn btn-primary" name="action" value="Email">
+				    			<!--<input type ="submit" class="btn btn-primary" name="action" value="Email">-->
 							</form>
 						</div>
 					</div>

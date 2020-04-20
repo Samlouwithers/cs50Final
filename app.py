@@ -6,7 +6,15 @@ import time
 import random
 import string
 
-from flask import Flask, flash, redirect, render_template, request, session
+import pdfkit
+#import webbrowser
+
+#stuff to send email
+
+
+from flask import Flask, flash, redirect, render_template, request, session, make_response
+from flask_mail import Mail, Message
+import os
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
@@ -19,7 +27,19 @@ from reportlab.pdfgen import canvas
 # frontend tools!!
 #from flask.ext.scss import Scss
 
+#setup main app
 app = Flask(__name__)
+
+#mail stuff
+
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = '*****@gmail.com'
+app.config['MAIL_PASSWORD'] = '*****'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = '*****@gmail.com'
+mail = Mail(app)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -64,7 +84,6 @@ c = conn.cursor()
 # Create table
 # db.execute('''CREATE TABLE stocks (date text, trans text, symbol text, qty real, price real)''')
 
-
 @app.route('/')
 def index():
 	# return "Hello World!"
@@ -72,6 +91,7 @@ def index():
 	# db.execute("INSERT INTO stocks VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
 	# conn.commit()
 	# conn.close()
+
 	return render_template("index.html")
 
 
@@ -165,7 +185,10 @@ def dashboard():
 
 		if request.form['action'] == 'Edit':
 			print("we are editing!")
+			minDate = time.strftime('%Y-%m-%d')
+			return render_template('edit.html', user=user, minDate=minDate, index=index, haveGuests=haveGuests, myGuests=myGuests, myEvents=myEvents)
 		elif request.form['action'] == 'PDF':
+			
 			print("PDF")
 
 
@@ -173,35 +196,37 @@ def dashboard():
 			print(index)
 			print(myEvents[index]['eventName'])
 
-			fileName = myEvents[index]['eventName'] + " guest list.pdf"
-			documentTitle = myEvents[index]['eventName'] + " Guest List"
-			title = myEvents[index]['eventName'] + " guest list"
-			subTitle = 'thank you for using Peacocktopia RSVP! HAVE A GREAT PARTY!'
+			rendered = render_template('pdf_template.html', user=user, index=index, haveGuests=haveGuests, myGuests=myGuests, myEvents=myEvents)
+			pdf = pdfkit.from_string(rendered, False)
 
-			textLines = [
-			'welcome to the party',
-			'here it is'
-			]
+			response = make_response(pdf)
+			response.headers['Content-Type'] = 'application/pdf'
+			#response.headers['Content-Disposition'] = 'inline; filename=guestList.pdf'
+			response.headers['Content-Disposition'] = 'attachment; filename=guestList.pdf'
 
-			print(fileName)
+			return response;
 
-			pdf = canvas.Canvas(fileName)
-			pdf.setTitle(documentTitle)
-
-
-			#Title
-			pdf.drawCenteredString(50, 780, title)
-			
-			pdf.save()
 
 		elif request.form['action'] == 'Email':
 			print("Email Guests")
 		return render_template("dashboard.html", user=user, haveGuests=haveGuests, haveEvents=haveEvents, myEvents=myEvents, myGuests=myGuests)
 
 	else:
-
 		
 		return render_template("dashboard.html", user=user, haveGuests=haveGuests, haveEvents=haveEvents, myEvents=myEvents, myGuests=myGuests)
+
+
+
+@app.route('/<user>/<index>')
+def pdf_template(user,index):
+	rendered = render_template('pdf_template.html', user=user, index=index)
+	pdf = pdfkit.from_string(rendered, False)
+
+	response = make_response(pdf)
+	response.headers['Content-Type'] = 'application/pdf'
+	response.headers['Content-Disposition'] = 'inline; filename=guestList.pdf'
+
+	return response;
 
 
 
@@ -264,6 +289,29 @@ def newevent():
 		#print(addressTest)
 		
 		return render_template("newevent.html", states=states, stateLen=stateLen, minDate=minDate)
+
+
+@app.route("/edit", methods=["GET", "POST"])
+@login_required
+def edit():
+	if request.method == "POST":
+		print("post")
+		
+		eventID = request.form.get("id")
+		eventName = request.form.get("eventName")
+		date = request.form.get("date")
+		address = request.form.get("address")
+		theme = request.form.get("theme")
+		registry = request.form.get("registry")
+
+		c.execute("UPDATE events SET eventName=?, date=?, address=?, theme=?, registry=? WHERE id=?", (eventName, date, address, theme, registry, eventID))
+
+		conn.commit()
+
+		flash(eventName + ' has been updated!')
+		return redirect("/dashboard")
+	else:
+		return render_template("edit.html")
 
 
 
@@ -378,7 +426,18 @@ def login():
 @app.route("/guestInfo", methods=["GET", "POST"])
 def guestInfo():
 	grabCode = session.get('partyCode')
-	print("this your code? " + grabCode)
+	#print("this your code? " + grabCode)
+
+	c.execute("SELECT * FROM events WHERE codes=?", (grabCode,))
+	records = c.fetchall()
+
+	host_ID = records[0]['user_id']
+	#grab host name
+	c.execute("SELECT username FROM users WHERE id=?", (host_ID,))
+	hostName = c.fetchone()['username']
+	print(str(hostName))
+
+
 	if request.method == "POST":
 
 		#use code to get event ID
@@ -402,6 +461,21 @@ def guestInfo():
 		conn.commit()
 
 		flash('Thank you ' + first + " for your RSVP! You are all done. Is there anybody else you would like to RSVP for?")
+
+		#send email to host that new user has RSVP'd
+
+		#grab host name
+		c.execute("SELECT email FROM users WHERE id=?", (host_ID,))
+		hostEmail = c.fetchone()['email']
+		party = records[0]['eventName']
+
+		msg = Message('Hey ' + hostName + ' you have a new RSVP!', recipients=['jibac75706@emailhost99.com'])
+		#plain text message
+		msg.body = 'Hello' + hostName + '! ' + first + ' ' + last + ' just RSVPed to ' + party
+		#fancy email
+		msg.html = render_template("email_RSVP.html", hostName=hostName, first=first, last=last, party=party)
+		mail.send(msg)
+
 		return redirect("/guestInfo")
 
 
@@ -417,12 +491,15 @@ def guestInfo():
 			#another plus one? 
 			#create array for all the plus ones
 	else:
-		c.execute("SELECT * FROM events WHERE codes=?", (grabCode,))
-		records = c.fetchall()
-
-		host_ID = records[0]['user_id']
-		#grab host name
-		c.execute("SELECT username FROM users WHERE id=?", (host_ID,))
-		hostName = c.fetchone()['username']
-		print(str(hostName))
 		return render_template("guestInfo.html", codes=grabCode, records=records, hostName=hostName)
+
+
+@app.route("/logout")
+def logout():
+    """Log user out"""
+
+    # Forget any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
